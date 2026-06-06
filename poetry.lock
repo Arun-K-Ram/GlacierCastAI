@@ -1753,21 +1753,6 @@ test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd ; python_
 tqdm = ["tqdm"]
 
 [[package]]
-name = "gdal"
-version = "3.13.1"
-description = "GDAL: Geospatial Data Abstraction Library"
-optional = false
-python-versions = ">=3.8.0"
-groups = ["main"]
-markers = "python_version >= \"3.12\" and python_full_version < \"3.14.1\" and (sys_platform == \"darwin\" or sys_platform == \"win32\" or sys_platform == \"emscripten\") or sys_platform != \"win32\" and sys_platform != \"emscripten\" and python_version >= \"3.12\" and python_full_version < \"3.14.1\""
-files = [
-    {file = "gdal-3.13.1.tar.gz", hash = "sha256:94bb64d729ce73ceb75a314a15cba92696cdd854d99b6bf6b88a7b551227db74"},
-]
-
-[package.extras]
-numpy = ["numpy (>1.0.0)"]
-
-[[package]]
 name = "geopandas"
 version = "1.1.3"
 description = "Geographic pandas extensions"
@@ -7560,4 +7545,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "93676b9f39549ec930a155fe6c9a113f6e3a738776b757bfe8987dc291220180"
+content-hash = "36f39ab4a86ecbe60bc7c409378a4e0633c11a3f73b883be518e0e42efccce14"
