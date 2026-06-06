@@ -5,7 +5,7 @@ Downloads monthly mean surface variables for a given glacier bounding box
 and year range. Variables: 2m temperature, total precipitation, snowfall,
 and surface net solar radiation.
 
-ERA5 spatial resolution: 0.25° (~28km) — coarse but the only globally
+ERA5 spatial resolution: 0.25° (~28km) - coarse but the only globally
 consistent reanalysis dataset spanning 1940-present.
 """
 

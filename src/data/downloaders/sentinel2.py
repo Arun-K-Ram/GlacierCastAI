@@ -3,7 +3,7 @@ Sentinel-2 L2A downloader via Microsoft Planetary Computer STAC API.
 
 Downloads surface reflectance scenes for a given glacier bounding box,
 date range, and cloud cover threshold. Sentinel-2 provides 10m resolution
-vs Landsat's 30m — used for recent years (2015-present).
+vs Landsat's 30m - used for recent years (2015-present).
 """
 
 import logging
@@ -26,7 +26,7 @@ SENTINEL2_BANDS = {
     "nir":   "B08",
     "swir1": "B11",
     "swir2": "B12",
-    "scl":   "SCL",   # Scene Classification Layer — used for cloud masking
+    "scl":   "SCL",   # Scene Classification Layer - used for cloud masking
 }
 
 
@@ -80,7 +80,7 @@ def download_scene(
     """
     Download specific bands from a single Sentinel-2 STAC item.
 
-    Always downloads SCL band alongside spectral bands — it is
+    Always downloads SCL band alongside spectral bands - it is
     required for cloud masking in the preprocessing step.
 
     Args:
