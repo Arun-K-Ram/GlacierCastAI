@@ -38,35 +38,29 @@ def build_train_augmentation(
     """
     transforms = [
         # Rotation-invariant spatial transforms
-        # Glaciers have no canonical "up" direction
         A.RandomRotate90(p=0.5),
         A.HorizontalFlip(p=0.5),
         A.VerticalFlip(p=0.5),
 
         # Small affine perturbation
-        # Simulates slight misregistration between acquisitions
-        A.ShiftScaleRotate(
-            shift_limit=0.02,
-            scale_limit=0.05,
-            rotate_limit=10,
-            border_mode=0,
+        A.Affine(
+            translate_percent=0.02,
+            scale=(0.95, 1.05),
+            rotate=(-10, 10),
             p=0.3,
         ),
 
-        # Coarse dropout simulates cloud shadows and occlusion
+        # Coarse dropout simulates cloud shadows
         A.CoarseDropout(
-            max_holes=8,
-            max_height=32,
-            max_width=32,
-            fill_value=np.nan,
+            num_holes_range=(1, 8),
+            hole_height_range=(16, 32),
+            hole_width_range=(16, 32),
+            fill=0,
             p=cloud_inject_prob,
         ),
-
-        # Gaussian noise simulates sensor noise on reflectance values
-        A.GaussNoise(
-            std_range=(0.001, 0.005),
-            p=0.3,
-        ),
+        # Note: GaussNoise removed from albumentations pipeline
+        # Multi-band sensor noise is applied per-band in augment_sample()
+        # via numpy directly — albumentations GaussNoise assumes 3 channels
     ]
 
     return A.Compose(
