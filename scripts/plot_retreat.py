@@ -198,11 +198,13 @@ if len(sample_years) >= 2:
         ax.set_title(f"{year}\n{areas_km2[years.index(year)]:.1f} km²",
                      fontsize=12, fontweight="bold")
         ax.axis("off")
+    
+    fig, axes = plt.subplots(1, len(sample_years), figsize=(5 * len(sample_years), 6))
 
     fig.suptitle("Aletsch Glacier - Binary Glacier Mask Over Time",
                  fontsize=14, fontweight="bold", y=1.02)
     plt.tight_layout()
-    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
     plt.savefig(FIG_DIR / "aletsch_mask_decades.png", dpi=150, bbox_inches="tight")
     plt.show()
     print("Saved: aletsch_mask_decades.png")
