@@ -20,12 +20,12 @@ logger = logging.getLogger(__name__)
 STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
 LANDSAT_BANDS = {
-    "blue":  "SR_B2",
-    "green": "SR_B3",
-    "red":   "SR_B4",
-    "nir":   "SR_B5",
-    "swir1": "SR_B6",
-    "swir2": "SR_B7",
+    "blue":  "blue",
+    "green": "green",
+    "red":   "red",
+    "nir":   "nir08",
+    "swir1": "swir16",
+    "swir2": "swir22",
 }
 
 
