@@ -1,0 +1,79 @@
+model:
+  backbone:
+    type: resnet50
+    pretrained: true
+    freeze_epochs: 5
+    in_channels: 3
+  temporal:
+    type: convlstm
+    hidden_dim: 256
+    num_layers: 3
+    kernel_size: 3
+    dropout: 0.1
+    num_heads: 8
+    ff_dim: 512
+    seq_len: 4
+  climate_encoder:
+    input_dim: 16
+    hidden_dim: 128
+    num_heads: 4
+    num_layers: 2
+    dropout: 0.1
+  decoder:
+    channels:
+    - 256
+    - 128
+    - 64
+    - 32
+    - 16
+    skip_channels:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+  output_heads:
+    hidden_dim: 128
+    dropout: 0.1
+  loss_weights:
+    dice: 0.5
+    bce: 0.3
+    boundary: 0.2
+    retreat_rate: 0.5
+    risk_score: 0.3
+training:
+  seed: 42
+  epochs: 50
+  batch_size: 4
+  num_workers: 0
+  pin_memory: true
+  gradient_clip: 1.0
+  precision: 16-mixed
+  optimizer:
+    lr: 0.0001
+    weight_decay: 0.0001
+  scheduler:
+    warmup_epochs: 5
+    min_lr: 1.0e-06
+  early_stopping:
+    monitor: val/iou
+    patience: 15
+    mode: max
+  checkpointing:
+    dirpath: experiments/checkpoints
+    monitor: val/iou
+    mode: max
+    save_top_k: 3
+data:
+  sequences_dir: data/processed/sequences
+  batch_size: 4
+  num_workers: 0
+  climate_dim: 16
+wandb:
+  project: GlacierCastAI
+  entity: null
+  tags:
+  - v1
+  - resnet50
+  - convlstm
+  log_every_n_steps: 10
