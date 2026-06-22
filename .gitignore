@@ -1,7 +1,7 @@
-data/raw/ 
-data/processed/ 
-data/augmented/ 
-.cdsapirc 
-.env 
-"experiments/" 
-"wandb/" 
+data/raw/
+data/processed/
+data/augmented/
+.cdsapirc
+.env
+experiments/
+wandb/
