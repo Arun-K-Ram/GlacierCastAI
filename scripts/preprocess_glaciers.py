@@ -99,7 +99,50 @@ def compute_terrain_features(dem: np.ndarray) -> np.ndarray:
     slope       = slope.astype(np.float32)
     return np.stack([slope, aspect_sin, aspect_cos], axis=0)  # (3, H, W)
 
+def load_climate_features(glacier_name: str, year: int) -> np.ndarray:
+    """
+    Load ERA5 climate features for a given glacier and year.
+    Returns (16,) feature vector: 4 variables x 4 seasons.
+    """
+    import xarray as xr
 
+    climate_dir = Path("data/raw/climate") / glacier_name
+    file_ua     = climate_dir / "data_stream-moda_stepType-avgua.nc"
+    file_ad     = climate_dir / "data_stream-moda_stepType-avgad.nc"
+
+    if not file_ua.exists() or not file_ad.exists():
+        return np.zeros(16, dtype=np.float32)
+
+    try:
+        ds_ua = xr.open_dataset(file_ua, engine="netcdf4")
+        ds_ad = xr.open_dataset(file_ad, engine="netcdf4")
+
+        t2m = ds_ua["t2m"].mean(dim=["latitude", "longitude"]) - 273.15
+        tp  = ds_ad["tp"].mean(dim=["latitude", "longitude"]) * 1000
+        sf  = ds_ad["sf"].mean(dim=["latitude", "longitude"]) * 1000
+        ssr = ds_ad["ssr"].mean(dim=["latitude", "longitude"])
+
+        features = []
+        for var in [t2m, tp, sf, ssr]:
+            year_data = var.sel(valid_time=var.valid_time.dt.year == year)
+            if len(year_data) == 0:
+                features.extend([0.0, 0.0, 0.0, 0.0])
+                continue
+            for months in [[12, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]:
+                seasonal = year_data.sel(
+                    valid_time=year_data.valid_time.dt.month.isin(months)
+                )
+                val = float(seasonal.mean()) if len(seasonal) > 0 else 0.0
+                features.append(val)
+
+        ds_ua.close()
+        ds_ad.close()
+        return np.array(features[:16], dtype=np.float32)
+
+    except Exception as e:
+        print(f"    Climate load failed for {glacier_name} {year}: {e}")
+        return np.zeros(16, dtype=np.float32)
+    
 def extract_patches(image, mask, dem_features, scene_id,
                     glacier_name, year):
     """
@@ -200,6 +243,9 @@ def process_glacier(name: str, config: dict):
             scene_id, name, year,
         )
 
+        # Load climate ONCE per scene not per patch
+        climate = load_climate_features(name, year)
+
         # Save patches
         for p in patches:
             fname = out_dir / f"{scene_id}_r{p['row']}_c{p['col']}.npz"
@@ -209,6 +255,7 @@ def process_glacier(name: str, config: dict):
                 mask=p["mask"],
                 dem=p["dem"],
                 year=np.array([p["year"]]),
+                climate=climate,
             )
 
         all_patches += len(patches)

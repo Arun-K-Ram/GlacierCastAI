@@ -60,7 +60,7 @@ training:
     patience: 15
     mode: max
   checkpointing:
-    dirpath: experiments/checkpoints
+    dirpath:  experiments/checkpoints/exp002
     monitor: val/iou
     mode: max
     save_top_k: 3
@@ -73,7 +73,8 @@ wandb:
   project: GlacierCastAI
   entity: null
   tags:
-  - v1
+  - v2
   - resnet50
   - convlstm
+  - exp002-image-climate
   log_every_n_steps: 10

@@ -107,7 +107,8 @@ def build_callbacks(config: dict, debug: bool) -> list:
     callbacks = [
         ModelCheckpoint(
             dirpath=ckpt_cfg.get("dirpath", "experiments/checkpoints"),
-            filename="{epoch:02d}-{val/iou:.4f}",
+            filename="{epoch:02d}-valiou{val/iou:.4f}",
+            auto_insert_metric_name=False,
             monitor=ckpt_cfg.get("monitor", "val/iou"),
             mode=ckpt_cfg.get("mode", "max"),
             save_top_k=ckpt_cfg.get("save_top_k", 3),
@@ -131,7 +132,7 @@ def build_callbacks(config: dict, debug: bool) -> list:
 def train(config: dict, args):
     pl.seed_everything(config["training"].get("seed", 42), workers=True)
 
-    # ── W&B Logger ─────────────────────────────────────────────────────
+    #  W&B Logger 
     wb_cfg = config.get("wandb", {})
     wandb_logger = WandbLogger(
         project=wb_cfg.get("project", "GlacierCastAI"),
@@ -141,16 +142,16 @@ def train(config: dict, args):
         mode="disabled" if args.debug else "online",
     )
 
-    # ── DataModule ─────────────────────────────────────────────────────
+    #  DataModule 
     data_config = {**config["data"], "batch_size": config["training"]["batch_size"]}
     datamodule = GlacierDataModule(data_config)
 
-    # ── Model ──────────────────────────────────────────────────────────
+    #  Model 
     model = GlacierCastAIModule(config)
 
     logger.info(f"Model parameter counts: {model.model.count_parameters()}")
 
-    # ── Trainer ────────────────────────────────────────────────────────
+    #  Trainer 
     trainer = pl.Trainer(
         max_epochs=config["training"]["epochs"],
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
@@ -164,10 +165,10 @@ def train(config: dict, args):
         deterministic=False,    # True slows training significantly
     )
 
-    # ── Train ──────────────────────────────────────────────────────────
+    #  Train 
     trainer.fit(model, datamodule=datamodule, ckpt_path=args.resume)
 
-    # ── Test ───────────────────────────────────────────────────────────
+    #  Test 
     if not args.debug:
         trainer.test(model, datamodule=datamodule, ckpt_path="best")
 
