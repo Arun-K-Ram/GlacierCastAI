@@ -44,7 +44,7 @@ GlacierCastAI predicts glacier retreat acceleration before it becomes visible in
 |-----|----------|----------|----------|-------|
 | 001 | Image only | **0.326** | **0.158** | Baseline |
 | 002 | Image + Climate | 0.313 | 0.133 | Re-run (checkpoint bug fix) |
-| 003 | Image + Climate + DEM | - | - |  Running |
+| 003 | Image + Climate + DEM | 0.317 | 0.136 | Re-run (checkpoint bug fix) |
 | 004 | Prithvi foundation model | - | - | Pending |
 | 005 | Climate only (MLP) | - | - | Pending |
 
@@ -69,7 +69,7 @@ Required API keys (copy `.env.example` to `.env`):
 python scripts/train.py --config configs/model.yaml
 
 # Resume from checkpoint
-python scripts/train.py --config configs/model.yaml --resume experiments/checkpoints/exp002/last.ckpt
+python scripts/train.py --config configs/model.yaml --resume experiments/checkpoints/exp003/last.ckpt
 ```
 
 ## Repository Structure
