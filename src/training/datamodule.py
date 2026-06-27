@@ -71,8 +71,38 @@ class GlacierSequenceDataset(Dataset):
         )
 
         # Climate: zeros placeholder until ERA5 is downloaded
+        # Load climate features from each patch
         T = image_seq.shape[0]
-        climate_seq = np.zeros((T, self.climate_dim), dtype=np.float32)
+        climate_list = []
+        for path in seq["input_paths"]:
+            data = np.load(path)
+            if "climate" in data:
+                climate_list.append(data["climate"].astype(np.float32))
+            else:
+                climate_list.append(np.zeros(self.climate_dim, dtype=np.float32))
+
+        climate_seq = np.stack(climate_list, axis=0)  # (T, F)
+
+        # Normalize climate features using physical ranges
+        # Features: [t2m_DJF, t2m_MAM, t2m_JJA, t2m_SON,
+        #            tp_DJF, tp_MAM, tp_JJA, tp_SON,
+        #            sf_DJF, sf_MAM, sf_JJA, sf_SON,
+        #            ssr_DJF, ssr_MAM, ssr_JJA, ssr_SON]
+        climate_means = np.array([
+            0, 5, 10, 5,           # t2m (°C) seasonal means
+            2, 3, 2, 3,            # tp (mm) seasonal means
+            1, 2, 1, 2,            # sf (mm) seasonal means
+            5e6, 8e6, 1.5e7, 7e6  # ssr (J/m²) seasonal means
+        ], dtype=np.float32)
+
+        climate_stds = np.array([
+            15, 15, 15, 15,        # t2m std
+            5, 5, 5, 5,            # tp std
+            3, 3, 3, 3,            # sf std
+            3e6, 3e6, 3e6, 3e6    # ssr std
+        ], dtype=np.float32)
+
+        climate_seq = (climate_seq - climate_means) / (climate_stds + 1e-8)
 
         # Target
         target_data   = np.load(seq["target_path"])
